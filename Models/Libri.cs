@@ -6,5 +6,5 @@ public class Libri
     public string Titolo { get; set; }
     public string Autore { get; set; }
     public int DataPubblicazione { get; set; }
-    public ICollection<LibriCategorie> LibriCategorie { get; set; }
+    public List<string> LibriCategorie { get; set; }
 }
