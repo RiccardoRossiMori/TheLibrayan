@@ -5,21 +5,21 @@ namespace TheLibrayan.Data;
 
 public class LinkContext
 {
-    public LinkContext(string connectionString, string secretKey)
+    protected LinkContext(string connectionString, string secretKey)
     {
         ConnectionString = connectionString;
         SecretKey = secretKey;
     }
 
-    public string ConnectionString { get; }
-    public string SecretKey { get; }
+    private string ConnectionString { get; set; }
+    public string SecretKey { get; set; }
 
-    public SqlConnection GetConnection()
+    private SqlConnection GetConnection()
     {
         return new SqlConnection(ConnectionString);
     }
 
-    public void ExecuteNonQuery(string query, JObject parameters)
+    protected void ExecuteNonQuery(string query, JObject parameters)
     {
         using var connection = GetConnection();
         connection.Open();
@@ -35,11 +35,21 @@ public class LinkContext
         return command;
     }
 
-    public int ExecuteScalar(string query, JObject parameters)
+    protected int ExecuteScalar(string query, JObject parameters)
     {
         using var connection = GetConnection();
         connection.Open();
         using var command = GetSqlCommand(query, parameters, connection);
         return (int)command.ExecuteScalar();
     }
+    
+    public bool ExecuteReader(string query, JObject parameters)
+    {
+        using var connection = GetConnection();
+        connection.Open();
+        using var command = GetSqlCommand(query, parameters, connection);
+        using var reader = command.ExecuteReader();
+        return reader.Read();
+    }
+    
 }

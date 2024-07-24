@@ -3,7 +3,7 @@ using Newtonsoft.Json.Linq;
 namespace TheLibrayan.Data;
 
 /// <summary>
-/// La classe CategoryContext gestisce la connessione al database e l'esecuzione delle query per quanto riguarda la tabella Categorie.
+/// La classe CategoryContext gestisce l'esecuzione delle query per quanto riguarda la tabella Categorie.
 /// </summary>
 public class CategoryContext : LinkContext
 {
@@ -23,9 +23,8 @@ public class CategoryContext : LinkContext
             var configuration = new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .Build();
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
-            var secretKey = configuration["SecretKey"];
-            _instance = new CategoryContext(connectionString, secretKey);
+            _instance = new CategoryContext(configuration.GetConnectionString("DefaultConnection"),
+                configuration["SecretKey"]);
             return _instance;
         }
     }

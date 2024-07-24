@@ -9,7 +9,7 @@ namespace TheLibrayan.Controllers;
 [ApiController]
 public class CategoryController : ControllerBase
 {
-    private readonly AuthContext _authContext = AuthContext.Instance;
+    //private readonly AuthContext _authContext = AuthContext.Instance;
     private readonly CategoryContext _categoryContext = CategoryContext.Instance;
 
     //TODO: non ricordo se funziona o meno, da testare in maniera appropriata più avanti ed implementare in maniera corretta su altri metodi.
@@ -23,24 +23,18 @@ public class CategoryController : ControllerBase
     [HttpPost("add-category")]
     public IActionResult AddCategory([FromBody] Categorie category)
     {
-        if (_categoryContext.AddCategoryIfNotExists(category))
-        {
-            var categoryJson = JsonConvert.SerializeObject(category);
-            return Ok($"Category added: {categoryJson}");
-        }
+        if (!_categoryContext.AddCategoryIfNotExists(category)) return BadRequest("Category not added");
+        var categoryJson = JsonConvert.SerializeObject(category);
+        return Ok($"Category added: {categoryJson}");
 
-        return BadRequest("Category not added");
     }
 
     [HttpDelete("delete-category")]
     public IActionResult DeleteCategory([FromBody] Categorie category)
     {
-        if (_categoryContext.DeleteCategoryIfEmpty(category))
-        {
-            var categoryJson = JsonConvert.SerializeObject(category);
-            return Ok($"Category deleted: {categoryJson}");
-        }
+        if (!_categoryContext.DeleteCategoryIfEmpty(category)) return BadRequest("Category not deleted");
+        var categoryJson = JsonConvert.SerializeObject(category);
+        return Ok($"Category deleted: {categoryJson}");
 
-        return BadRequest("Category not deleted");
     }
 }

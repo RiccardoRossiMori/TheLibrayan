@@ -1,11 +1,12 @@
 using System.Data.SqlClient;
+using Newtonsoft.Json.Linq;
 
 namespace TheLibrayan.Data;
 
 /// <summary>
-/// La classe AuthContext gestisce la connessione al database e l'esecuzione delle query per quanto riguarda la tabella Utenti.
+/// La classe AuthContext gestisce l'esecuzione delle query per quanto riguarda la tabella Utenti.
 /// </summary>
-public class AuthContext
+public class AuthContext : LinkContext
 {
     public string ConnectionString { get; private set; }
     public string SecretKey { get; }
@@ -27,7 +28,7 @@ public class AuthContext
         }
     }
 
-    public AuthContext(string connectionString, string secretKey)
+    public AuthContext(string connectionString, string secretKey): base(connectionString, secretKey)
     {
         ConnectionString = connectionString;
         SecretKey = secretKey;
@@ -36,31 +37,29 @@ public class AuthContext
 
     public bool UserExists(string modelEmail)
     {
-        using var connection = new SqlConnection(ConnectionString);
-        connection.Open();
-        var command = new SqlCommand($"SELECT * FROM Utenti WHERE Email = '{modelEmail}'", connection);
-        using var reader = command.ExecuteReader();
-        return reader.Read();
+        var query = "SELECT * FROM Utenti WHERE Email = @Email";
+        var parameters = new JObject { { "@Email", modelEmail } };
+        return ExecuteReader(query, parameters);
     }
 
     public bool ValidateUser(string modelEmail, string modelPassword)
     {
-        using var connection = new SqlConnection(ConnectionString);
-        connection.Open();
-        var command = new SqlCommand(
-            $"SELECT * FROM Utenti WHERE Email = '{modelEmail}' AND Password = '{modelPassword}'", connection);
-        using var reader = command.ExecuteReader();
-        return reader.Read();
+        var query = "SELECT * FROM Utenti WHERE Email = @Email AND Password = @Password";
+        var parameters = new JObject { { "@Email", modelEmail }, { "@Password", modelPassword } };
+        return ExecuteReader(query, parameters);
     }
 
 
     public void CreateUser(string modelEmail, string modelPassword, string modelNome, string modelCognome)
     {
-        using var connection = new SqlConnection(ConnectionString);
-        connection.Open();
-        var command = new SqlCommand(
-            $"INSERT INTO Utenti (Email, Password, Nome, Cognome) VALUES ('{modelEmail}', '{modelPassword}', '{modelNome}', '{modelCognome}')",
-            connection);
-        command.ExecuteNonQuery();
+        var query = "INSERT INTO Utenti (Email, Password, Nome, Cognome) VALUES (@Email, @Password, @Nome, @Cognome)";
+        var parameters = new JObject
+        {
+            ["@Email"] = modelEmail,
+            ["@Password"] = modelPassword,
+            ["@Nome"] = modelNome,
+            ["@Cognome"] = modelCognome
+        };
+        ExecuteNonQuery(query, parameters);
     }
 }
