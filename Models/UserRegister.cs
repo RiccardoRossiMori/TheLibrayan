@@ -1,7 +1,7 @@
 namespace TheLibrayan.Models;
 
-public class UserRegister: UserLogin
+public class UserRegister : UserLogin
 {
-    public string Nome { get; }
-    public string Cognome { get; }
+    public string Nome { get; set; }
+    public string Cognome { get; set; }
 }
