@@ -1,40 +1,42 @@
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using TheLibrayan.Data;
+using TheLibrayan.Models;
 
 namespace TheLibrayan.Controllers;
 
+/// <summary>
+///     Controller per la gestione delle operazioni relative alle categorie.
+/// </summary>
 [Route("api/[controller]")]
 [ApiController]
 public class CategoryController : ControllerBase
 {
-    //private readonly AuthContext _authContext = AuthContext.Instance;
     private readonly CategoryContext _categoryContext = CategoryContext.Instance;
 
-    //TODO: non ricordo se funziona o meno, da testare in maniera appropriata più avanti ed implementare in maniera corretta su altri metodi.
-    [Authorize]
-    [HttpGet("test-token")]
-    public IActionResult TestToken()
-    {
-        return Ok("ok, bro");
-    }
-
+    /// <summary>
+    ///     Aggiunge una nuova categoria.
+    /// </summary>
+    /// <param name="category">La categoria da aggiungere.</param>
+    /// <returns>Un messaggio di conferma.</returns>
     [HttpPost("add-category")]
     public IActionResult AddCategory([FromBody] Categorie category)
     {
-        if (!_categoryContext.AddCategoryIfNotExists(category)) return BadRequest("Category not added");
+        if (!_categoryContext.AddCategoryIfNotExists(category)) return BadRequest("Categoria non aggiunta");
         var categoryJson = JsonConvert.SerializeObject(category);
-        return Ok($"Category added: {categoryJson}");
-
+        return Ok($"Categoria aggiunta: {categoryJson}");
     }
 
+    /// <summary>
+    ///     Elimina una categoria se è vuota.
+    /// </summary>
+    /// <param name="category">La categoria da eliminare.</param>
+    /// <returns>Un messaggio di conferma.</returns>
     [HttpDelete("delete-category")]
     public IActionResult DeleteCategory([FromBody] Categorie category)
     {
-        if (!_categoryContext.DeleteCategoryIfEmpty(category)) return BadRequest("Category not deleted");
+        if (!_categoryContext.DeleteCategoryIfEmpty(category)) return BadRequest("Categoria non eliminata");
         var categoryJson = JsonConvert.SerializeObject(category);
-        return Ok($"Category deleted: {categoryJson}");
-
+        return Ok($"Categoria eliminata: {categoryJson}");
     }
 }
